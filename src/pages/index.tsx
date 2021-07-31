@@ -1,5 +1,7 @@
-import { GetServerSideProps} from 'next'
-
+/* eslint-disable @next/next/no-img-element */
+import { GetStaticProps } from 'next'
+// import { GetServerSideProps } from 'next'
+import Image from 'next/image'
 import Head from 'next/head'
 import { SubscribeButton } from '../components/SubscribeButton'
 import { stripe } from '../services/stripe'
@@ -38,11 +40,29 @@ export default function Home({ product }:HomeProps) {
   )
 }
 
+// 3 formas de conteúdo:
+// Client Side - Quando não precisa necessáriamente fazer parte da indexação.
+// Server Side - Melhor indexação com dados voltados para o usúario.
+// Static Site Generation - Melhor indexação.
 
+//Post do Blog : 
+// Conteúdo do post (SSG)
+// Comentários (Client Side) 
+
+
+// export const getServerSideProps: GetServerSideProps = async () => {
 //Tudo que é retornado do GetServerSideProps é mostrado na props da Home
-//Server Side Rendering 
+//Renderizado no nodejs
+//Server Side Rendering
+//Melhor para conteúdos específicos para o usúario. Dados dinamicos. 
 
-export const getServerSideProps: GetServerSideProps = async () => {
+//////////////////////////////////////
+
+
+//GetStaticProps deixa de forma estática, e o revalidate é o tempo que quer para revalidar o conteudo da pagina
+//Bom para valores que não vão mudar tão cedo.
+
+  export const getStaticProps: GetStaticProps = async () => {
   const price = await stripe.prices.retrieve('price_1JFmZ5KdGvDLOCxsET6aNIn5')
 
   const product = {
@@ -56,6 +76,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {  
       product
-    }
+    },
+    revalidate: 60 * 60 * 24, // 24 horas
   }
 }
